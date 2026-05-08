@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SpaceBook</title>
+  <meta name="application-name" content="SpaceBook">
+  <meta name="description" content="Reserve public spaces across Bengaluru">
+  <meta name="theme-color" content="#a07ac8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SpaceBook">
+
+  <!-- External fonts & icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo"><div class="dot"></div> SpaceBook <span style="font-size:13px;font-weight:400;color:var(--muted);margin-left:4px;">Bengaluru</span></div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem">Reserve public spaces across the city.</p>
+    <div class="login-tabs">
+      <button class="login-tab active" id="loginTabBtn" onclick="switchLoginTab('login')">Sign In</button>
+      <button class="login-tab" id="signupTabBtn" onclick="switchLoginTab('signup')">Create Account</button>
+    </div>
+    <!-- Login form -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" value="arjun@spacebook.in">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" value="password123">
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:0.5rem" onclick="doLogin()">
+        <i class="ti ti-login"></i> Sign In
+      </button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px;">Demo: any email + any password</p>
+    </div>
+    <!-- Signup form -->
+    <div id="signupForm" style="display:none">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-input" id="signupFirst" placeholder="Arjun">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-input" id="signupLast" placeholder="Joshi">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="signupEmail" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input type="tel" class="form-input" id="signupPhone" placeholder="+91 98765 43210">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="signupPassword" placeholder="Min 8 characters">
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:0.5rem" onclick="doSignup()">
+        <i class="ti ti-user-plus"></i> Create Account
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE DROPDOWN ══ -->
+<div class="profile-dropdown" id="profileDropdown">
+  <div class="profile-header-section">
+    <div class="profile-avatar-big" id="profileAvatarBig">AJ</div>
+    <div>
+      <div class="profile-info-name" id="profileName">Arjun Joshi</div>
+      <div class="profile-info-email" id="profileEmail">arjun@spacebook.in</div>
+      <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px;" id="profilePhone">+91 98765 43210</div>
+    </div>
+  </div>
+  <button class="profile-menu-item" onclick="openEditProfile()"><i class="ti ti-user-edit"></i> Edit Profile</button>
+  <button class="profile-menu-item" onclick="openEditProfile('email')"><i class="ti ti-mail"></i> Change Email</button>
+  <button class="profile-menu-item" onclick="openEditProfile('phone')"><i class="ti ti-phone"></i> Change Phone</button>
+  <button class="profile-menu-item" onclick="openEditProfile('password')"><i class="ti ti-lock"></i> Change Password</button>
+  <div class="profile-menu-divider"></div>
+  <button class="profile-menu-item danger" onclick="doLogout()"><i class="ti ti-logout"></i> Sign Out</button>
+</div>
+
+<!-- ══ EDIT PROFILE MODAL ══ -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal edit-profile-modal">
+    <button class="modal-close" onclick="closeModal('editProfileModal')"><i class="ti ti-x"></i></button>
+    <h3 style="margin-bottom:6px" id="editProfileTitle">Edit Profile</h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:1.5rem">Update your account details</p>
+    <div id="editProfileFields"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('editProfileModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveProfile()"><i class="ti ti-check"></i> Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav class="nav" style="display:none">
+  <div class="nav-brand">
+    <div class="dot"></div>
+    SpaceBook
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('browse')" id="tab-browse">
+      <i class="ti ti-layout-grid"></i><span>Browse</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('mybookings')" id="tab-mybookings">
+      <i class="ti ti-ticket"></i><span>My Bookings</span>
+      <span id="booking-badge" style="display:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-family:var(--mono)"></span>
+    </button>
+    <button class="nav-tab" onclick="showPage('analytics')" id="tab-analytics">
+      <i class="ti ti-chart-bar"></i><span>Analytics</span>
+    </button>
+  </div>
+  <div class="nav-right">
+    <span id="navClock" style="font-family:var(--mono);font-size:11px;color:var(--muted)"></span>
+    <button class="notif-bell-btn" onclick="toggleNotifPanel()" id="notifBellBtn" title="Notifications">
+      <i class="ti ti-bell"></i>
+      <span class="notif-bell-badge" id="notifBadge" style="display:none">0</span>
+    </button>
+  </div>
+  <div class="user-chip" onclick="toggleProfileDropdown()" id="userChip">
+    <div class="user-avatar" id="navAvatar">AJ</div>
+    <span id="navUserName">Arjun J.</span>
+    <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted);margin-left:2px"></i>
+  </div>
+</nav>
+
+<!-- Init loading -->
+<div id="init-loading">
+  <div class="loader"></div>
+  <div class="log-lines" id="logLines"></div>
+</div>
+
+<!-- Main App (hidden until ready) -->
+<div id="app" style="display:none">
+
+  <!-- ══ BROWSE PAGE ══ -->
+  <div class="page active" id="page-browse">
+    <div class="page-header">
+      <h2>Find a Space</h2>
+      <p>Browse and reserve available public spaces near you</p>
+    </div>
+    <div class="filters" id="filters">
+      <button class="filter-chip active" onclick="filterSpaces('all', this)">All Spaces</button>
+      <button class="filter-chip" onclick="filterSpaces('Parking', this)">🅿 Parking</button>
+      <button class="filter-chip" onclick="filterSpaces('Coworking', this)">💼 Coworking</button>
+      <button class="filter-chip" onclick="filterSpaces('Study Zone', this)">📚 Study Zone</button>
+      <button class="filter-chip" onclick="filterSpaces('Sports Venue', this)">🏅 Sports</button>
+      <button class="filter-chip" onclick="filterSpaces('Community Hall', this)">🏛 Community Hall</button>
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" class="search-input" placeholder="Search spaces…" id="searchInput" oninput="filterSpaces(currentFilter, null)">
+      </div>
+    </div>
+    <div class="spaces-grid" id="spacesGrid"></div>
+  </div>
+
+  <!-- ══ MY BOOKINGS PAGE ══ -->
+  <div class="page" id="page-mybookings">
+    <div class="page-header">
+      <h2>My Bookings</h2>
+      <p>View, manage and cancel your reservations</p>
+    </div>
+    <div class="stats-row" id="myStats"></div>
+    <div class="bookings-list" id="bookingsList"></div>
+  </div>
+
+  <!-- ══ ANALYTICS PAGE ══ -->
+  <div class="page" id="page-analytics">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;">
+      <div>
+        <h2 style="font-size:28px;font-weight:700;letter-spacing:-0.03em;margin-bottom:6px">System Analytics</h2>
+        <p style="color:var(--muted);font-size:14px">Predictive utilization & no-show model results</p>
+      </div>
+      <div class="sim-status" id="simStatus"></div>
+    </div>
+    <div class="model-strip" id="modelStrip"></div>
+    <div class="metric-grid" id="metricGrid"></div>
+    <div class="chart-row">
+      <div class="card">
+        <div class="section-title">Space Utilization</div>
+        <div style="position:relative;height:220px;"><canvas id="utilChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="section-title">No-Show Rate by Space</div>
+        <div style="position:relative;height:220px;"><canvas id="nsChart"></canvas></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Live Booking Status</div>
+      <table>
+        <thead><tr><th>Space</th><th>Type</th><th>Utilization</th><th>Reserved</th><th>Actual</th><th>No-shows</th><th>Walk-ins</th></tr></thead>
+        <tbody id="statusTable"></tbody>
+      </table>
+    </div>
+    <div class="chart-row">
+      <div class="card">
+        <div class="section-title">No-Show Prediction Results</div>
+        <table>
+          <thead><tr><th>Space</th><th>Historic %</th><th>Predicted %</th><th>Risk</th><th>Action</th></tr></thead>
+          <tbody id="predTable"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="section-title">Reallocation Decisions</div>
+        <table>
+          <thead><tr><th>Space</th><th>Was</th><th>Recommended</th><th>Reason</th></tr></thead>
+          <tbody id="reallocTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Demand Forecast — Next 24 Hours</div>
+      <div style="position:relative;height:160px;"><canvas id="forecastChart"></canvas></div>
+    </div>
+    <!-- ══ Time × Space × Day Heatmap ══ -->
+    <div class="card" style="margin-bottom:14px" id="heatmapCard">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div class="section-title" style="margin-bottom:0">⏰ Busyness Heatmap — Time × Day × Space</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Space:</span>
+          <select id="heatmapSpaceSelect" onchange="renderHeatmap()" style="font-family:var(--mono);font-size:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:4px 10px;color:var(--text);outline:none;">
+            <option value="all">All Spaces (avg)</option>
+          </select>
+        </div>
+      </div>
+      <div id="heatmapContainer" style="overflow-x:auto;">
+        <div id="heatmapGrid" style="min-width:520px;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Low</span>
+        <div style="display:flex;gap:2px;">
+          <div style="width:16px;height:16px;border-radius:3px;background:rgba(160,122,200,0.15)"></div>
+          <div style="width:16px;height:16px;border-radius:3px;background:rgba(160,122,200,0.38)"></div>
+          <div style="width:16px;height:16px;border-radius:3px;background:rgba(200,122,180,0.55)"></div>
+          <div style="width:16px;height:16px;border-radius:3px;background:rgba(194,68,110,0.65)"></div>
+          <div style="width:16px;height:16px;border-radius:3px;background:rgba(194,68,110,0.9)"></div>
+        </div>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">High</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:12px;">Hover a cell for details</span>
+      </div>
+    </div>
+    <!-- ══ Weekly Busyness Prediction ══ -->
+    <div class="card weekly-chart-section" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div class="section-title" style="margin-bottom:0">Weekly Busyness Prediction</div>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">Avg occupancy across all spaces</span>
+      </div>
+      <div class="weekly-grid" id="weeklyGrid"></div>
+    </div>
+    <div class="card">
+      <div class="section-title">Automated Insights</div>
+      <div id="insights"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ BOOKING MODAL ══ -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('bookModal')"><i class="ti ti-x"></i></button>
+    <h3 id="bookModalTitle">Reserve Space</h3>
+    <div class="modal-sub" id="bookModalSub"></div>
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input type="text" class="form-input" id="bookName" placeholder="Arjun Joshi" value="Arjun Joshi">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" class="form-input" id="bookEmail" placeholder="arjun@example.com" value="arjun@example.com">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" id="bookDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time Slot</label>
+        <select class="form-select" id="bookHour">
+          <option value="6">6:00 AM</option>
+          <option value="7">7:00 AM</option>
+          <option value="8">8:00 AM</option>
+          <option value="9" selected>9:00 AM</option>
+          <option value="10">10:00 AM</option>
+          <option value="11">11:00 AM</option>
+          <option value="12">12:00 PM</option>
+          <option value="13">1:00 PM</option>
+          <option value="14">2:00 PM</option>
+          <option value="15">3:00 PM</option>
+          <option value="16">4:00 PM</option>
+          <option value="17">5:00 PM</option>
+          <option value="18">6:00 PM</option>
+          <option value="19">7:00 PM</option>
+          <option value="20">8:00 PM</option>
+          <option value="21">9:00 PM</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Duration</label>
+      <select class="form-select" id="bookDuration">
+        <option value="1">1 hour</option>
+        <option value="2" selected>2 hours</option>
+        <option value="3">3 hours</option>
+        <option value="4">4 hours</option>
+        <option value="8">Full day (8 hrs)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Purpose / Notes</label>
+      <input type="text" class="form-input" id="bookNotes" placeholder="Team meeting, study session, workout…">
+      <div class="form-hint">Optional — helps us improve space allocation</div>
+    </div>
+    <div id="noShowWarning" style="display:none;background:rgba(255,225,86,0.08);border:1px solid rgba(255,225,86,0.25);border-radius:10px;padding:12px 14px;margin-bottom:1rem;font-size:13px;color:var(--yellow);">
+      <i class="ti ti-alert-triangle" style="margin-right:6px"></i>
+      <strong>High demand slot.</strong> This space has an elevated no-show rate. Your booking may be subject to waitlist if overbooked.
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label"><i class="ti ti-mail" style="color:var(--accent2)"></i> Send confirmation email</span>
+      <div class="toggle-switch on" id="emailToggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('bookModal')">Cancel</button>
+      <button class="btn-primary" onclick="confirmBooking()">
+        <i class="ti ti-check"></i> Confirm Booking
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CANCEL CONFIRM MODAL ══ -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon"><i class="ti ti-ticket-off"></i></div>
+    <h3 style="margin-bottom:8px">Cancel Booking?</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem" id="cancelModalDesc">
+      This will release the reserved slot. Walk-in users may take your spot.
+    </p>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn-secondary" onclick="closeModal('cancelModal')">Keep Booking</button>
+      <button class="btn-danger" onclick="confirmCancel()"><i class="ti ti-trash"></i> Cancel Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══ NOTIFICATION PANEL ══ -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header">
+    <span><i class="ti ti-bell" style="margin-right:6px;color:var(--accent)"></i>Notifications</span>
+    <button onclick="clearNotifs()" style="font-size:11px;font-family:var(--mono);background:none;border:none;color:var(--muted);cursor:pointer;">Mark all read</button>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div style="padding:2rem;text-align:center;color:var(--muted);font-size:13px;">No notifications yet</div>
+  </div>
+</div>
+
+<!-- ══ EMAIL PREVIEW MODAL ══ -->
+<div class="modal-overlay" id="emailPreviewModal">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close" onclick="closeModal('emailPreviewModal')"><i class="ti ti-x"></i></button>
+    <h3 style="margin-bottom:8px"><i class="ti ti-mail" style="color:var(--accent2);margin-right:8px"></i>Booking Confirmation Email</h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:1.5rem">Simulated email sent to your registered address</p>
+    <div id="emailPreviewContent" style="background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:20px;font-size:13px;line-height:1.7;"></div>
+    <div class="modal-actions" style="margin-top:1rem">
+      <button class="btn-primary" onclick="closeModal('emailPreviewModal')"><i class="ti ti-check"></i> Got it!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PWA INSTALL BANNER ══ -->
+<div id="pwaInstallBanner" style="
+  display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#a07ac8,#d8bee5);
+  color:#fff;border-radius:16px;padding:14px 20px;
+  box-shadow:0 8px 32px rgba(160,122,200,0.45);
+  z-index:9999;display:none;align-items:center;gap:14px;
+  font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:500;
+  max-width:340px;width:calc(100vw - 48px);
+  animation: slideUp 0.4s ease;
+">
+  <span style="font-size:26px">📲</span>
+  <div style="flex:1">
+    <div style="font-weight:700;font-size:15px;margin-bottom:2px">Add SpaceBook to Home Screen</div>
+    <div style="opacity:0.85;font-size:12px">Install for the full app experience</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <button id="pwaInstallBtn" style="
+      background:#fff;color:#a07ac8;border:none;border-radius:8px;
+      padding:7px 14px;font-family:'Space Grotesk',sans-serif;
+      font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;
+    ">Install</button>
+    <button id="pwaDismissBtn" style="
+      background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;
+      padding:5px 14px;font-family:'Space Grotesk',sans-serif;
+      font-size:12px;cursor:pointer;
+    ">Not now</button>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!-- Backend engine (data models, simulation, booking logic) -->
+<script src="../backend/engine.js"></script>
+<!-- Frontend app (UI rendering, auth, navigation, PWA) -->
+<script src="app.js"></script>
+</body>
+</html>
